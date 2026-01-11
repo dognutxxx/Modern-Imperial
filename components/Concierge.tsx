@@ -1,13 +1,20 @@
 
 import React, { useState } from 'react';
 import { getConciergeRecommendation } from '../services/geminiService';
-import { Recommendation } from '../types';
+import { Recommendation, Language } from '../types';
+import { translations } from '../translations';
 
-const Concierge: React.FC = () => {
+interface ConciergeProps {
+  lang: Language;
+}
+
+const Concierge: React.FC<ConciergeProps> = ({ lang }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [pref, setPref] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Recommendation | null>(null);
+  
+  const t = translations[lang].concierge;
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,7 +22,7 @@ const Concierge: React.FC = () => {
     
     setLoading(true);
     try {
-      const rec = await getConciergeRecommendation(pref);
+      const rec = await getConciergeRecommendation(pref, lang);
       setResult(rec);
     } catch (err) {
       alert("Something went wrong. Please try again.");
@@ -39,7 +46,7 @@ const Concierge: React.FC = () => {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
           <div className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-              <h2 className="text-2xl font-display font-bold text-primary dark:text-accent">Digital Concierge</h2>
+              <h2 className="text-2xl font-display font-bold text-primary dark:text-accent">{t.title}</h2>
               <button onClick={() => setIsOpen(false)} className="material-icons text-slate-400 hover:text-slate-600">close</button>
             </div>
             
@@ -47,20 +54,20 @@ const Concierge: React.FC = () => {
               {!result && !loading && (
                 <div className="space-y-4">
                   <p className="text-slate-600 dark:text-slate-400">
-                    Tell us your taste preferences, dietary needs, or the occasion, and we'll craft a bespoke menu just for you.
+                    {t.desc}
                   </p>
                   <form onSubmit={handleAsk} className="space-y-4">
                     <textarea 
                       value={pref}
                       onChange={(e) => setPref(e.target.value)}
-                      placeholder="e.g. I love spicy food and seafood, celebrating an anniversary..."
+                      placeholder={t.placeholder}
                       className="w-full h-32 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-accent focus:border-transparent outline-none resize-none dark:text-white"
                     />
                     <button 
                       type="submit"
                       className="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-opacity-90 transition-all flex items-center justify-center space-x-2"
                     >
-                      <span>Generate My Experience</span>
+                      <span>{t.btn}</span>
                       <span className="material-icons">send</span>
                     </button>
                   </form>
@@ -70,7 +77,7 @@ const Concierge: React.FC = () => {
               {loading && (
                 <div className="py-12 flex flex-col items-center justify-center space-y-4">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
-                  <p className="text-slate-500 animate-pulse">Consulting the Head Chef...</p>
+                  <p className="text-slate-500 animate-pulse">{t.loading}</p>
                 </div>
               )}
 
@@ -89,14 +96,14 @@ const Concierge: React.FC = () => {
                     <div className="pt-4 border-t border-accent/20">
                       <p className="text-sm font-bold text-primary dark:text-accent mb-1 flex items-center">
                         <span className="material-icons text-xs mr-2">local_bar</span> 
-                        CHEF'S PAIRING
+                        {t.pairing}
                       </p>
                       <p className="text-slate-600 dark:text-slate-400 italic text-sm">{result.pairing}</p>
                     </div>
                   </div>
                   
                   <div className="text-sm text-slate-500 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
-                    <strong>Why this works:</strong> {result.reasoning}
+                    <strong>{t.logic}:</strong> {result.reasoning}
                   </div>
 
                   <button 

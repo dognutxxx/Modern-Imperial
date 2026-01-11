@@ -4,13 +4,14 @@ import { Recommendation } from "../types";
 
 const API_KEY = process.env.API_KEY || "";
 
-export const getConciergeRecommendation = async (userPreferences: string): Promise<Recommendation> => {
+export const getConciergeRecommendation = async (userPreferences: string, lang: string = 'EN'): Promise<Recommendation> => {
   const ai = new GoogleGenAI({ apiKey: API_KEY });
   
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `Suggest a luxury 3-course set menu for a fine-dining Chinese restaurant called 'Modern Imperial' based on these preferences: ${userPreferences}. 
-    The menu should sound authentic yet innovative.`,
+    The menu should sound authentic yet innovative. 
+    PLEASE PROVIDE THE RESPONSE IN THE FOLLOWING LANGUAGE: ${lang}.`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
